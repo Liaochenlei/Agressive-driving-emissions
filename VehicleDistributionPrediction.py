@@ -3,8 +3,6 @@ import numpy as np
 from scipy import interpolate
 import matplotlib.pyplot as plt
 from statsmodels.tsa.arima.model import ARIMA
-from statsmodels.tsa.stattools import adfuller  # 平稳性检验
-from statsmodels.stats.diagnostic import acorr_ljungbox     # 白噪声检验
 
 ####################################################
 # 以下是年份补全
@@ -87,12 +85,11 @@ plt.ylim(0, 0.6)
 # plt.legend()
 plt.show()
 
+
 # 读出数据
 Total = np.vstack([Car_max_ratio * Carnumber, Car_mid_ratio * Carnumber, Car_min_ratio * Carnumber])
 # 直接变成DataFrame为一整列，需要转置变成一行
 df_T = pd.DataFrame(Total)
 df = pd.DataFrame(df_T.values.T)
 # 写入csv文件，mode = 'a'表示只在末尾追加写入，但是可能写入重复数据，注意最后导入的时候要进行查重清洗
-df.to_csv('1.csv', index=False, header=False, mode='a')
-
-data = Car_mid_predict
+df.to_csv('VehicleDistribution.csv', index=False, header=False, mode='a')
