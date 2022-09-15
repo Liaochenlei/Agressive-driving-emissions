@@ -20,8 +20,9 @@ Rate_NOx = np.asarray(data1.iloc[:, 3])
 Rate_PM = np.asarray(data1.iloc[:, 4])
 
 data2 = pd.read_csv('RoadCongestionMileage.csv')
-Highway_c = np.asarray(data2.iloc[:, 3])
-City_c = np.asarray(data2.iloc[:, 4])
+Highway_c = np.asarray(data2.iloc[:, 1])
+City_c = np.asarray(data2.iloc[:, 2])
+
 
 S_rate_max = car_max / Totalcar
 S_rate_min = car_min / Totalcar
@@ -43,7 +44,6 @@ Per = 5  # 饱和流占总拥堵的比例
 Times_high = Highway_c * Center * Per * 60 * 24 / Totalcar / 10000
 Times_city = City_c * Center * Per * 60 * 4 / Totalcar / 10000
 Times = Times_high + Times_city
-
 
 
 CO2_min_real = np.array([9.979958639, 9.798465262, 9.305623263, 9.120657266])
@@ -68,18 +68,6 @@ NOx_min_real = np.array([0.008309782, 0.007923105, 0.005481023, 0.00473535])
 PM_max_real = np.array([0.00059342, 0.00054232, 0.000343192, 0.000237823])
 PM_mid_real = np.array([0.000338145, 0.00030952, 0.000144958, 9.47843E-05])
 PM_min_real = np.array([0.000225671, 0.000204321, 9.72861E-05, 6.76638E-05])
-
-
-"""
-#输出污染参数
-Total = np.vstack((CO2_max_real, CO2_mid_real, CO2_min_real, CO_max_real, CO_mid_real, CO_min_real, HC_max_real, HC_mid_real, HC_min_real, NOx_max_real, NOx_mid_real, NOx_min_real, PM_max_real, PM_mid_real, PM_min_real))
-#直接变成DataFrame为一整列，需要转置变成一行
-df_T = pd.DataFrame(Total)
-df = pd.DataFrame(df_T.values.T)
-#写入csv文件，mode = 'a'表示只在末尾追加写入，但是可能写入重复数据，注意最后导入的时候要进行查重清洗
-df.to_csv('Pollution_real.csv', index = False, header = False, mode = 'a')
-"""
-
 
 
 # 输入参数
@@ -256,45 +244,174 @@ for i in range(1, len(year)):
     PM_all[i] = PM_all[i - 1] + PM_year[i]
 
 
-"""
-#输出污染参数
-Total = np.vstack((CO_min, CO_mid, CO_max, HC_min, HC_mid, HC_max, NOx_min, NOx_mid, NOx_max, PM_min, PM_mid, PM_max, CO2_min, CO2_mid, CO2_max,))
-#直接变成DataFrame为一整列，需要转置变成一行
-df_T = pd.DataFrame(Total)
-df = pd.DataFrame(df_T.values.T)
-#写入csv文件，mode = 'a'表示只在末尾追加写入，但是可能写入重复数据，注意最后导入的时候要进行查重清洗
-df.to_csv('Pollution.csv', index = False, header = False, mode = 'a')
 
-
-#输出CO2总共与单车参数
-mid = (CO2_max * S_rate_max + CO2_mid * S_rate_mid + CO2_min * S_rate_min)
-Total = np.vstack((CO2_year, CO2, CO2_min * Times * 365 / 10 ** 3, mid * Times * 365 / 10 ** 3, CO2_max * Times * 365 / 10 ** 3, (mid - CO2_min) / (CO2_max - CO2_min)))
-#直接变成DataFrame为一整列，需要转置变成一行
-df_T = pd.DataFrame(Total)
-df = pd.DataFrame(df_T.values.T)
-#写入csv文件，mode = 'a'表示只在末尾追加写入，但是可能写入重复数据，注意最后导入的时候要进行查重清洗
-df.to_csv('CO2.csv', index = False, header = False, mode = 'a')
-
-
-#输出污染物总共与单车参数
-CO_use_mid = (CO_max * S_rate_max + CO_mid * S_rate_mid + CO_min * S_rate_min) * Times * 365
-HC_use_mid = (HC_max * S_rate_max + HC_mid * S_rate_mid + HC_min * S_rate_min) * Times * 365
-NOx_use_mid = (NOx_max * S_rate_max + NOx_mid * S_rate_mid + NOx_min * S_rate_min) * Times * 365
-PM_use_mid = (PM_max * S_rate_max + PM_mid * S_rate_mid + PM_min * S_rate_min) * Times * 365
-Total_mid = CO_use_mid + HC_use_mid + NOx_use_mid + PM_use_mid
-Total_min = (CO_min + HC_min + NOx_min + PM_min) * Times * 365
-Total_max = (CO_max + HC_max + NOx_max + PM_max) * Times * 365
-
-Total = np.vstack((Total_pol_year, Total_pol, Total_min / 1000, Total_mid / 1000, Total_max / 1000, (Total_mid - Total_min) / (Total_max - Total_min)))
-#直接变成DataFrame为一整列，需要转置变成一行
-df_T = pd.DataFrame(Total)
-df = pd.DataFrame(df_T.values.T)
-#写入csv文件，mode = 'a'表示只在末尾追加写入，但是可能写入重复数据，注意最后导入的时候要进行查重清洗
-df.to_csv('Pollutant.csv', index = False, header = False, mode = 'a')
-"""
+# CO2变化图
+fig, axs = plt.subplots(1, 1, dpi=900)
+plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.2, hspace=0, wspace=0)
+# 去掉右侧和顶部边框
+axs.spines['top'].set_visible(False)
+axs.spines['right'].set_visible(False)
+# 设置图片大小
+fig.set_size_inches(2500 / 900, 2500 / 900)
+# 设置坐标轴
+plt.xlabel("Year", fontsize=14)
+plt.ylabel("CO$_{2}$ emission (g)", fontsize=14)
+plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
+# 修改底部坐标轴（x轴）的粗细
+axs.spines['bottom'].set_linewidth(0.3)
+axs.spines['left'].set_linewidth(0.3)
+# 仅开启y轴方向的坐标轴
+plt.grid(axis='y', linewidth=0.2)
+# 输出图像
+plt.plot(year, CO2_min, color=Color[0], label=Dis[0])
+plt.plot(year, CO2_mid, color=Color[1], label=Dis[1])
+plt.plot(year, CO2_max, color=Color[2], label=Dis[2])
+#设置坐标轴范围
+plt.ylim((0, 36))
+plt.xlim((2013, 2050))
+#设置坐标轴刻度
+plt.yticks(np.array([9, 18, 27, 36]))
+plt.xticks(np.array([2020, 2030, 2040, 2050]))
+#plt.xticks(rotation=20)
+#plt.legend(fontsize=8, loc='upper right')
+# 保存
+plt.savefig(r'D:\Fig5.png', dpi=900)
+plt.close()
 
 
 
+# CO变化图
+fig, axs = plt.subplots(1, 1, dpi=900)
+plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.22, hspace=0, wspace=0)
+# 去掉右侧和顶部边框
+axs.spines['top'].set_visible(False)
+axs.spines['right'].set_visible(False)
+# 设置图片大小
+fig.set_size_inches(2500 / 900, 2500 / 900)
+# 设置坐标轴
+plt.xlabel("Year", fontsize=14)
+plt.ylabel("CO emission (10$^{-1}$ g)", fontsize=14)
+plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
+# 修改底部坐标轴（x轴）的粗细
+axs.spines['bottom'].set_linewidth(0.3)
+axs.spines['left'].set_linewidth(0.3)
+# 仅开启y轴方向的坐标轴
+plt.grid(axis='y', linewidth=0.2)
+# 输出图像
+plt.plot(year, CO_min * 10, color=Color[0], label=Dis[0])
+plt.plot(year, CO_mid * 10, color=Color[1], label=Dis[1])
+plt.plot(year, CO_max * 10, color=Color[2], label=Dis[2])
+# 设置坐标轴范围
+plt.ylim((0, 2))
+plt.xlim((2013, 2050))
+plt.xticks(np.array([2020, 2030, 2040, 2050]))
+# plt.xticks(rotation=20)
+# plt.legend(fontsize=8, loc='upper right')
+# 设置坐标轴刻度
+plt.yticks(np.array([0.5, 1, 1.5, 2]))
+# 保存
+plt.savefig(r'D:\Fig6.png', dpi=900)
+plt.close()
+
+
+# NOx变化图
+fig, axs = plt.subplots(1, 1, dpi=900)
+plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.22, hspace=0, wspace=0)
+# 去掉右侧和顶部边框
+axs.spines['top'].set_visible(False)
+axs.spines['right'].set_visible(False)
+# 设置图片大小
+fig.set_size_inches(2500 / 900, 2500 / 900)
+# 设置坐标轴
+plt.xlabel("Year", fontsize=14)
+plt.ylabel("NO$_{x}$ emission (10$^{-2}$ g)", fontsize=14)
+plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
+# 修改底部坐标轴（x轴）的粗细
+axs.spines['bottom'].set_linewidth(0.3)
+axs.spines['left'].set_linewidth(0.3)
+# 仅开启y轴方向的坐标轴
+plt.grid(axis='y', linewidth=0.2)
+# 输出图像
+plt.plot(year, NOx_min * 100, color=Color[0], label=Dis[0])
+plt.plot(year, NOx_mid * 100, color=Color[1], label=Dis[1])
+plt.plot(year, NOx_max * 100, color=Color[2], label=Dis[2])
+#设置坐标轴范围
+plt.ylim((0, 2))
+plt.xlim((2013, 2050))
+plt.xticks(np.array([2020, 2030, 2040, 2050]))
+#plt.xticks(rotation=20)
+#plt.legend(fontsize=8, loc='upper right')
+#设置坐标轴刻度
+plt.yticks(np.array([0.5, 1.0, 1.5, 2.0]))
+# 保存
+plt.savefig(r'D:\Fig7.png', dpi=900)
+plt.close()
+
+# HC变化图
+fig, axs = plt.subplots(1, 1, dpi=900)
+plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.22, hspace=0, wspace=0)
+# 去掉右侧和顶部边框
+axs.spines['top'].set_visible(False)
+axs.spines['right'].set_visible(False)
+# 设置图片大小
+fig.set_size_inches(2500 / 900, 2500 / 900)
+# 设置坐标轴
+plt.xlabel("Year", fontsize=14)
+plt.ylabel("HC emission (10$^{-3}$ g)", fontsize=14)
+plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
+# 修改底部坐标轴（x轴）的粗细
+axs.spines['bottom'].set_linewidth(0.3)
+axs.spines['left'].set_linewidth(0.3)
+# 仅开启y轴方向的坐标轴
+plt.grid(axis='y', linewidth=0.2)
+# 输出图像
+plt.plot(year, HC_min * 1000, color=Color[0], label=Dis[0])
+plt.plot(year, HC_mid * 1000, color=Color[1], label=Dis[1])
+plt.plot(year, HC_max * 1000, color=Color[2], label=Dis[2])
+# 设置坐标轴范围
+plt.ylim((0, 6))
+plt.xlim((2013, 2050))
+plt.xticks(np.array([2020, 2030, 2040, 2050]))
+#plt.xticks(rotation=20)
+#plt.legend(fontsize=8, loc='upper right')
+# 设置坐标轴刻度
+plt.yticks(np.array([1.5, 3.0, 4.5, 6.0]))
+# 保存
+plt.savefig(r'D:\Fig8.png', dpi=900)
+plt.close()
+
+# PM变化图
+fig, axs = plt.subplots(1, 1, dpi=900)
+plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.22, hspace=0, wspace=0)
+# 去掉右侧和顶部边框
+axs.spines['top'].set_visible(False)
+axs.spines['right'].set_visible(False)
+# 设置图片大小
+fig.set_size_inches(2500 / 900, 2500 / 900)
+# 设置坐标轴
+plt.xlabel("Year", fontsize=14)
+plt.ylabel("PM emission (10$^{-4}$ g)", fontsize=14)
+plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
+# 修改底部坐标轴（x轴）的粗细
+axs.spines['bottom'].set_linewidth(0.3)
+axs.spines['left'].set_linewidth(0.3)
+# 仅开启y轴方向的坐标轴
+plt.grid(axis='y', linewidth=0.2)
+# 输出图像
+plt.plot(year, PM_min * 10000, color=Color[0], label=Dis[0])
+plt.plot(year, PM_mid * 10000, color=Color[1], label=Dis[1])
+plt.plot(year, PM_max * 10000, color=Color[2], label=Dis[2])
+#设置坐标轴范围
+plt.ylim((0, 6.4))
+plt.xlim((2013, 2050))
+plt.xticks(np.array([2020, 2030, 2040, 2050]))
+#plt.xticks(rotation=20)
+#plt.legend(fontsize=8, loc='upper right')
+#设置坐标轴刻度
+plt.yticks(np.array([1.6, 3.2, 4.8, 6.4]))
+# 保存
+plt.savefig(r'D:\Fig9.png', dpi=900)
+plt.close()
 
 
 # S比例变化图
@@ -333,8 +450,6 @@ plt.xticks(np.array([2013, 2020, 2030, 2040, 2050]))
 # 保存
 plt.savefig(r'D:\Fig10.png', dpi=900)
 plt.close()
-
-
 
 
 # S总量变化图
@@ -379,466 +494,7 @@ plt.close()
 
 
 
-# CO2变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.2, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-axs.spines['right'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(2500 / 900, 2500 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.ylabel("CO$_{2}$ emission (g)", fontsize=14)
-plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-plt.plot(year, CO2_min, color=Color[0], label=Dis[0])
-plt.plot(year, CO2_mid, color=Color[1], label=Dis[1])
-plt.plot(year, CO2_max, color=Color[2], label=Dis[2])
-#设置坐标轴范围
-plt.ylim((0, 36))
-plt.xlim((2013, 2050))
-#设置坐标轴刻度
-plt.yticks(np.array([9, 18, 27, 36]))
-plt.xticks(np.array([2020, 2030, 2040, 2050]))
-#plt.xticks(rotation=20)
-#plt.legend(fontsize=8, loc='upper right')
-# 保存
-plt.savefig(r'D:\Fig12.png', dpi=900)
-plt.close()
-
-
-
-"""
-# 其他污染变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.18, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-axs.spines['right'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(3500 / 900, 2500 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.ylabel("Total pollutants (10$^{-1}$ g)", fontsize=14)
-plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-plt.plot(year, (CO_min + PM_min + NOx_min + HC_min) * 10, color=Color[0], label=Dis[0])
-plt.plot(year, (CO_mid + PM_mid + NOx_mid + HC_mid) * 10, color=Color[1], label=Dis[1])
-plt.plot(year, (CO_max + PM_max + NOx_max + HC_max) * 10, color=Color[2], label=Dis[2])
-#设置坐标轴范围
-plt.ylim((0, 2))
-plt.xlim((2013, 2050))
-#设置坐标轴刻度
-plt.yticks(np.array([0.5, 1.0, 1.5, 2.0]))
-plt.xticks(np.array([2013, 2020, 2030, 2040, 2050]))
-#plt.xticks(rotation=20)
-#plt.legend(fontsize=8, loc='upper right')
-# 保存
-plt.savefig(r'D:\Fig13.png', dpi=900)
-plt.close()
-"""
-
-
-
-# CO变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.22, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-axs.spines['right'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(2500 / 900, 2500 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.ylabel("CO emission (10$^{-1}$ g)", fontsize=14)
-plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-plt.plot(year, CO_min * 10, color=Color[0], label=Dis[0])
-plt.plot(year, CO_mid * 10, color=Color[1], label=Dis[1])
-plt.plot(year, CO_max * 10, color=Color[2], label=Dis[2])
-# 设置坐标轴范围
-plt.ylim((0, 2))
-plt.xlim((2013, 2050))
-plt.xticks(np.array([2020, 2030, 2040, 2050]))
-# plt.xticks(rotation=20)
-# plt.legend(fontsize=8, loc='upper right')
-# 设置坐标轴刻度
-plt.yticks(np.array([0.5, 1, 1.5, 2]))
-# 保存
-plt.savefig(r'D:\Fig14.png', dpi=900)
-plt.close()
-
-
-# HC变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.22, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-axs.spines['right'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(2500 / 900, 2500 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.ylabel("HC emission (10$^{-3}$ g)", fontsize=14)
-plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-plt.plot(year, HC_min * 1000, color=Color[0], label=Dis[0])
-plt.plot(year, HC_mid * 1000, color=Color[1], label=Dis[1])
-plt.plot(year, HC_max * 1000, color=Color[2], label=Dis[2])
-# 设置坐标轴范围
-plt.ylim((0, 6))
-plt.xlim((2013, 2050))
-plt.xticks(np.array([2020, 2030, 2040, 2050]))
-#plt.xticks(rotation=20)
-#plt.legend(fontsize=8, loc='upper right')
-# 设置坐标轴刻度
-plt.yticks(np.array([1.5, 3.0, 4.5, 6.0]))
-# 保存
-plt.savefig(r'D:\Fig15.png', dpi=900)
-plt.close()
-
-
-
-# NOx变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.22, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-axs.spines['right'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(2500 / 900, 2500 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.ylabel("NO$_{x}$ emission (10$^{-2}$ g)", fontsize=14)
-plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-plt.plot(year, NOx_min * 100, color=Color[0], label=Dis[0])
-plt.plot(year, NOx_mid * 100, color=Color[1], label=Dis[1])
-plt.plot(year, NOx_max * 100, color=Color[2], label=Dis[2])
-#设置坐标轴范围
-plt.ylim((0, 2))
-plt.xlim((2013, 2050))
-plt.xticks(np.array([2020, 2030, 2040, 2050]))
-#plt.xticks(rotation=20)
-#plt.legend(fontsize=8, loc='upper right')
-#设置坐标轴刻度
-plt.yticks(np.array([0.5, 1.0, 1.5, 2.0]))
-# 保存
-plt.savefig(r'D:\Fig16.png', dpi=900)
-plt.close()
-
-
-# PM变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.22, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-axs.spines['right'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(2500 / 900, 2500 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.ylabel("PM emission (10$^{-4}$ g)", fontsize=14)
-plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-plt.plot(year, PM_min * 10000, color=Color[0], label=Dis[0])
-plt.plot(year, PM_mid * 10000, color=Color[1], label=Dis[1])
-plt.plot(year, PM_max * 10000, color=Color[2], label=Dis[2])
-#设置坐标轴范围
-plt.ylim((0, 6.4))
-plt.xlim((2013, 2050))
-plt.xticks(np.array([2020, 2030, 2040, 2050]))
-#plt.xticks(rotation=20)
-#plt.legend(fontsize=8, loc='upper right')
-#设置坐标轴刻度
-plt.yticks(np.array([1.6, 3.2, 4.8, 6.4]))
-# 保存
-plt.savefig(r'D:\Fig17.png', dpi=900)
-plt.close()
-
-
-
-"""
 # CO2总量变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.90, bottom=0.13, right=0.85, left=0.15, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(5500 / 900, 3000 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.xlim(2013,2050)
-plt.xticks(np.array([2013, 2020, 2030, 2040, 2050]))
-#plt.xticks(rotation=20)
-axs.set_ylabel("CO$_{2}$ emission (10$^{7}$ ton/year)", fontsize=14)
-axs.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-bwith = 0.1
-#plt.bar(year, CO2_year / 10 ** 7, yerr=CO2_year/10/ 10 ** 7, color='C0')
-axs.bar(year, CO2_year / 10 ** 7 * Low / Center, color=Color[0], width=1, alpha=0.8, label='Lower bound', edgecolor='black', linewidth=0.3)
-axs.bar(year, CO2_year / 10 ** 7 - CO2_year / 10 ** 7 * Low / Center, color=Color[1], width=1, alpha=0.8, bottom=CO2_year / 10 ** 7 * Low / Center , label='Predicted value', edgecolor='black', linewidth=0.3)
-axs.bar(year, CO2_year / 10 ** 7 * Up / Center - CO2_year / 10 ** 7, color=Color[2], width=1, alpha=0.8, bottom=CO2_year / 10 ** 7, label='Upper bound', edgecolor='black', linewidth=0.3)
-#axs.plot(year, CO2_year / 10 ** 7 * Low / Center, color=Color[0], alpha=1, label='Lower limit', linewidth=1)
-#axs.plot(year, CO2_year / 10 ** 7, color=Color[1], alpha=1, label='Predictive value', linewidth=1)
-#axs.plot(year, CO2_year / 10 ** 7 * Up / Center, color=Color[2], alpha=1, label='Upper limit', linewidth=1)
-#axs.fill_between(year, np.zeros(len(year)), CO2_year / 10 ** 7 * Low / Center, color=Color[0], alpha = 0.4, edgecolor='None')
-#axs.fill_between(year, CO2_year / 10 ** 7 * Low / Center, CO2_year / 10 ** 7, color=Color[1], alpha = 0.4, edgecolor='None')
-#axs.fill_between(year, CO2_year / 10 ** 7, CO2_year / 10 ** 7 * Up / Center, color=Color[2], alpha = 0.4, edgecolor='None')
-#设置坐标轴范围
-plt.legend(fontsize=14, loc='upper left')
-axs.set_ylim((0, 5))
-axs.set_yticks(np.arange(1,6))
-#第二个轴
-ax2 = axs.twinx()
-ax2.spines['top'].set_visible(False)
-ax2.set_ylabel("Accumulated CO$_{2}$ emission (10$^{8}$ ton)", fontsize=14)
-ax2.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-ax2.spines['bottom'].set_linewidth(0.3)
-ax2.spines['right'].set_linewidth(0.3)
-# 输出图像
-ax2.plot(year, CO2 / 10 ** 8, color='k', linewidth=1)
-ax2.fill_between(year, CO2 / 10 ** 8 * Low / Center, CO2 / 10 ** 8 * Up / Center, color='grey', alpha = 0.4, edgecolor='None')
-#设置坐标轴范围
-ax2.set_ylim((0, 10))
-ax2.set_yticks(np.arange(2, 11, 2))
-# 保存
-plt.savefig(r'D:\Fig18.png', dpi=900)
-plt.close()
-"""
-
-"""
-# 其他污染总量变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.90, bottom=0.13, right=0.85, left=0.15, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(5500 / 900, 3000 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.xlim(2013,2050)
-plt.xticks(np.array([2013, 2020, 2030, 2040, 2050]))
-#plt.xticks(rotation=20)
-axs.set_ylabel("Total pollution (10$^{5}$ ton/year)", fontsize=14)
-axs.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-axs.bar(year, Total_pol_year / 10 ** 4 * Low / Center / 10, color=Color[0], width=1, alpha=0.8, label='Lower bound', edgecolor='black', linewidth=0.3)
-axs.bar(year, Total_pol_year / 10 ** 4 / 10- Total_pol_year / 10 ** 4 * Low / Center / 10, color=Color[1], width=1, alpha=0.8, bottom=Total_pol_year / 10 ** 4 * Low / Center / 10, label='Predicted value', edgecolor='black', linewidth=0.3)
-axs.bar(year, Total_pol_year / 10 ** 4 * Up / Center / 10 - Total_pol_year / 10 ** 4 / 10, color=Color[2], width=1, alpha=0.8, bottom=Total_pol_year / 10 ** 4 / 10, label='Upper bound', edgecolor='black', linewidth=0.3)
-#设置坐标轴范围
-plt.legend(fontsize=14, loc='upper left')
-axs.set_ylim((0, 2))
-axs.set_yticks(np.arange(0.4,2.1,0.4))
-#第二个轴
-ax2 = axs.twinx()
-ax2.spines['top'].set_visible(False)
-ax2.set_ylabel("Accumulated pollution (10$^{6}$ ton)", fontsize=14)
-ax2.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-ax2.spines['bottom'].set_linewidth(0.3)
-ax2.spines['right'].set_linewidth(0.3)
-# 输出图像
-ax2.plot(year, Total_pol / 10 ** 5 / 10, color='k', linewidth=1)
-ax2.fill_between(year, Total_pol / 10 ** 5 * Low / Center / 10, Total_pol / 10 ** 5 * Up / Center / 10, color='grey', alpha = 0.4, edgecolor='None')
-#设置坐标轴范围
-ax2.set_ylim((0, 4))
-ax2.set_yticks(np.arange(0.8,4.1,0.8))
-# 保存
-plt.savefig(r'D:\Fig19.png', dpi=900)
-plt.close()
-"""
-
-"""
-# 单车全年CO2总量变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.90, bottom=0.13, right=0.85, left=0.15, hspace=0, wspace=0)
-# 设置图片大小
-fig.set_size_inches(5500 / 900, 3000 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.xlim(2013,2050)
-plt.xticks(np.array([2013, 2020, 2030, 2040, 2050]))
-#plt.xticks(rotation=20)
-axs.spines['top'].set_visible(False)
-axs.set_ylabel("Wasted proportion", fontsize=14)
-axs.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(1)
-axs.spines['right'].set_linewidth(0.3)
-# 输出图像
-mid = (CO2_max * S_rate_max + CO2_mid * S_rate_mid + CO2_min * S_rate_min)
-#axs.plot(year, (mid - CO2_min) / (CO2_max - CO2_min), color='black', linewidth=1, alpha=0.5)
-#axs.fill_between(year, np.zeros(len(year)), (mid - CO2_min) / (CO2_max - CO2_min), color='grey', alpha = 0.2, edgecolor='None')
-axs.bar(year, (mid - CO2_min) / (CO2_max - CO2_min), color='gray', width=1, alpha=0.2, label='Lower limit', edgecolor='black')
-#设置坐标轴范围
-axs.set_ylim((0.2, 0.7))
-axs.set_yticks(np.arange(0.3, 0.71, 0.1))
-
-#第二个轴
-ax2 = axs.twinx()
-# 去掉右侧和顶部边框
-ax2.spines['top'].set_visible(False)
-ax2.set_ylabel("CO$_{2}$ emission (kg/veh·year)", fontsize=14)
-ax2.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-ax2.spines['bottom'].set_linewidth(1)
-ax2.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-ax2.plot(year, CO2_min * Times * 365 / 10 ** 3, color=Color[0], linewidth=3, label=Dis[0])
-ax2.plot(year, mid * Times * 365 / 10 ** 3, color=Color[1], linewidth=3, label='Averaged emission')
-ax2.plot(year, CO2_max * Times * 365 / 10 ** 3, color=Color[2], linewidth=3, label=Dis[2])
-#设置坐标轴范围
-ax2.set_ylim((0, 300))
-ax2.set_yticks(np.arange(60, 301, 60))
-plt.legend(fontsize=12, loc='upper right')
-# 保存
-plt.savefig(r'D:\Fig22.png', dpi=900)
-plt.close()
-"""
-
-
-CO_use_mid = (CO_max * S_rate_max + CO_mid * S_rate_mid + CO_min * S_rate_min) * Times * 365
-HC_use_mid = (HC_max * S_rate_max + HC_mid * S_rate_mid + HC_min * S_rate_min) * Times * 365
-NOx_use_mid = (NOx_max * S_rate_max + NOx_mid * S_rate_mid + NOx_min * S_rate_min) * Times * 365
-PM_use_mid = (PM_max * S_rate_max + PM_mid * S_rate_mid + PM_min * S_rate_min) * Times * 365
-
-
-Total_mid = CO_use_mid + HC_use_mid + NOx_use_mid + PM_use_mid
-Total_min = (CO_min + HC_min + NOx_min + PM_min) * Times * 365
-Total_max = (CO_max + HC_max + NOx_max + PM_max) * Times * 365
-
-"""
-# 单车全年污染总量变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.90, bottom=0.13, right=0.85, left=0.15, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(5500 / 900, 3000 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.xlim(2013,2050)
-plt.xticks(np.array([2013, 2020, 2030, 2040, 2050]))
-#plt.xticks(rotation=20)
-axs.set_ylabel("Wasted proportion", fontsize=14)
-axs.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(1)
-axs.spines['right'].set_linewidth(0.3)
-# 输出图像
-axs.bar(year, (Total_mid - Total_min) / (Total_max - Total_min), color='gray', width=1, alpha=0.2, label='Lower limit', edgecolor='black')
-#axs.plot(year, (Total_mid - Total_min) / (Total_max - Total_min), color='black', linewidth=1, alpha=0.5)
-#axs.fill_between(year, np.zeros(len(year)), (Total_mid - Total_min) / (Total_max - Total_min), color='grey', alpha = 0.2, edgecolor='None')
-#设置坐标轴范围
-axs.set_ylim((0.2, 0.7))
-axs.set_yticks(np.arange(0.3, 0.71, 0.1))
-#第二个轴
-ax2 = axs.twinx()
-ax2.set_ylabel("Total pollution (kg/veh·year)", fontsize=14)
-ax2.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-ax2.spines['bottom'].set_linewidth(1)
-ax2.spines['left'].set_linewidth(0.3)
-ax2.spines['top'].set_visible(False)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-ax2.plot(year, Total_min / 1000, color=Color[0], linewidth=3, label=Dis[0])
-ax2.plot(year, Total_mid / 1000, color=Color[1], linewidth=3, label='Averaged pollution')
-ax2.plot(year, Total_max / 1000, color=Color[2], linewidth=3, label=Dis[2])
-#设置坐标轴范围
-ax2.set_ylim((0, 1.5))
-ax2.set_yticks(np.arange(0.3, 1.8, 0.3))
-plt.legend(fontsize=12, loc='upper right')
-# 保存
-plt.savefig(r'D:\Fig23.png', dpi=900)
-plt.close()
-"""
-
-
-"""
-# PM变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.95, bottom=0.18, right=0.90, left=0.18, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-axs.spines['right'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(3500 / 900, 2500 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.ylabel("PM emission (10$^{-4}$ g)", fontsize=14)
-plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-plt.plot(year, PM_min * 10000, color=Color[0], label=Dis[0])
-plt.plot(year, PM_mid * 10000, color=Color[1], label=Dis[1])
-plt.plot(year, PM_max * 10000, color=Color[2], label=Dis[2])
-#设置坐标轴范围
-plt.ylim((0, 2.4))
-plt.xlim((2010, 2050))
-plt.xticks(np.array([2010, 2020, 2030, 2040, 2050]))
-#plt.xticks(rotation=20)
-#plt.legend(fontsize=8, loc='upper right')
-#设置坐标轴刻度
-plt.yticks(np.array([0.6, 1.2, 1.8, 2.4]))
-# 保存
-plt.savefig(r'D:\Fig31.png', dpi=900)
-plt.close()
-
-"""
-
-
-# CO总量变化图
 fig, axs = plt.subplots(1, 1, dpi=900)
 plt.subplots_adjust(top=0.90, bottom=0.13, right=0.85, left=0.15, hspace=0, wspace=0)
 # 去掉右侧和顶部边框
@@ -880,7 +536,7 @@ ax2.fill_between(year, CO2 / 10 ** 8 * Low / Center, CO2 / 10 ** 8 * Up / Center
 ax2.set_ylim((0, 10))
 ax2.set_yticks(np.arange(2, 11, 2))
 # 保存
-plt.savefig(r'D:\Fig33.png', dpi=900)
+plt.savefig(r'D:\Fig12.png', dpi=900)
 plt.close()
 
 
@@ -928,7 +584,7 @@ ax2.set_ylim((0, 350))
 ax2.set_yticks(np.arange(70, 351, 70))
 plt.legend(fontsize=14, loc='upper right')
 # 保存
-plt.savefig(r'D:\Fig34.png', dpi=900)
+plt.savefig(r'D:\Fig13.png', dpi=900)
 plt.close()
 
 
@@ -980,7 +636,7 @@ ax2.fill_between(year, CO_all / 10 ** 6 * Low / Center, CO_all / 10 ** 6 * Up / 
 ax2.set_ylim((0, 3.5))
 ax2.set_yticks(np.arange(0.7,3.6,0.7))
 # 保存
-plt.savefig(r'D:\Fig35.png', dpi=900)
+plt.savefig(r'D:\Fig14.png', dpi=900)
 plt.close()
 
 
@@ -1029,7 +685,7 @@ ax2.set_ylim((0, 1.5))
 ax2.set_yticks(np.arange(0.3, 1.6, 0.3))
 plt.legend(fontsize=14, loc='upper right')
 # 保存
-plt.savefig(r'D:\Fig36.png', dpi=900)
+plt.savefig(r'D:\Fig15.png', dpi=900)
 plt.close()
 
 
@@ -1077,7 +733,7 @@ ax2.fill_between(year, HC_all / 10 ** 4 * Low / Center, HC_all / 10 ** 4 * Up / 
 ax2.set_ylim((0, 3.5))
 ax2.set_yticks(np.arange(0.9,4.6,0.9))
 # 保存
-plt.savefig(r'D:\Fig37.png', dpi=900)
+plt.savefig(r'D:\Fig16.png', dpi=900)
 plt.close()
 
 
@@ -1122,7 +778,7 @@ ax2.set_ylim((0, 3))
 ax2.set_yticks(np.arange(0.6, 3.1, 0.6))
 plt.legend(fontsize=14, loc='upper right')
 # 保存
-plt.savefig(r'D:\Fig38.png', dpi=900)
+plt.savefig(r'D:\Fig17.png', dpi=900)
 plt.close()
 
 
@@ -1168,7 +824,7 @@ ax2.fill_between(year, PM_all / 10 ** 3 * Low / Center, PM_all / 10 ** 3 * Up / 
 ax2.set_ylim((0, 7))
 ax2.set_yticks(np.arange(1.4,7.1,1.4))
 # 保存
-plt.savefig(r'D:\Fig41.png', dpi=900)
+plt.savefig(r'D:\Fig18.png', dpi=900)
 plt.close()
 
 
@@ -1214,7 +870,7 @@ ax2.set_ylim((0, 3))
 ax2.set_yticks(np.arange(0.6, 3.1, 0.6))
 plt.legend(fontsize=14, loc='upper right')
 # 保存
-plt.savefig(r'D:\Fig42.png', dpi=900)
+plt.savefig(r'D:\Fig19.png', dpi=900)
 plt.close()
 
 
@@ -1260,7 +916,7 @@ ax2.fill_between(year, NOx_all / 10 ** 5 * Low / Center, NOx_all / 10 ** 5 * Up 
 ax2.set_ylim((0, 1.5))
 ax2.set_yticks(np.arange(0.3, 1.6, 0.3))
 # 保存
-plt.savefig(r'D:\Fig43.png', dpi=900)
+plt.savefig(r'D:\Fig20.png', dpi=900)
 plt.close()
 
 
@@ -1306,81 +962,5 @@ ax2.set_ylim((0, 10))
 ax2.set_yticks(np.arange(2, 10.1, 2))
 plt.legend(fontsize=14, loc='upper right')
 # 保存
-plt.savefig(r'D:\Fig44.png', dpi=900)
+plt.savefig(r'D:\Fig21.png', dpi=900)
 plt.close()
-
-"""
-############################################
-# 读出所有数据
-
-# S比例变化图
-Total = np.vstack([S_rate_min, S_rate_mid, S_rate_max])
-
-# 单次变化图
-# CO2变化图（单位g）
-Total = np.vstack([Total, CO2_min, CO2_mid, CO2_max])
-# CO变化图（单位10-1g）
-Total = np.vstack([Total, CO_min * 10, CO_mid * 10, CO_max * 10])
-# HC变化图（单位10-3g）
-Total = np.vstack([Total, HC_min * 1000, HC_mid * 1000, HC_max * 1000])
-# NOx变化图（单位10-2g）
-Total = np.vstack([Total, NOx_min * 100, NOx_mid * 100, NOx_max * 100])
-# PM变化图（单位10-4g）
-Total = np.vstack([Total, PM_min * 10000, PM_mid * 10000, PM_max * 10000])
-
-
-# 总量和去年变化图
-# CO2逐年变化图（单位107ton/year）
-Total = np.vstack([Total, CO2_year / 10 ** 7 * Low / Center, CO2_year / 10 ** 7, CO2_year / 10 ** 7 * Up / Center])
-# CO2逐年变化图总量（单位108ton）
-Total = np.vstack([Total, CO2 / 10 ** 8 * Low / Center, CO2 / 10 ** 8, CO2 / 10 ** 8 * Up / Center])
-# 单车全年CO2总量变化图(kg/veh·year)
-Total = np.vstack([Total, CO2_min * Times * 365 / 10 ** 3, mid * Times * 365 / 10 ** 3, CO2_max * Times * 365 / 10 ** 3])
-# CO2比例
-Total = np.vstack([Total, (mid - CO2_min) / (CO2_max - CO2_min) * 100])
-
-# CO污染逐年（单位105ton/year）
-Total = np.vstack([Total, CO_year / 10 ** 5 * Low / Center, CO_year / 10 ** 5, CO_year / 10 ** 5 * Up / Center])
-# CO污染总量（单位106ton）
-Total = np.vstack([Total, CO_all / 10 ** 6 * Low / Center, CO_all / 10 ** 6, CO_all / 10 ** 6 * Up / Center])
-# 单车全年CO总量变化图(kg/veh·year)
-Total = np.vstack([Total, CO_min * Times * 365 / 1000, CO_use_mid / 1000, CO_max * Times * 365 / 1000])
-# CO比例
-Total = np.vstack([Total, (CO_use_mid - CO_min * Times * 365) / (CO_max * Times * 365 - CO_min * Times * 365) * 100])
-
-# HC污染总量变化图
-# HC污染逐年（单位103ton/year）
-Total = np.vstack([Total, HC_year / 10 ** 3 * Low / Center, HC_year / 10 ** 3, HC_year / 10 ** 3 * Up / Center])
-# HC污染总量（单位104ton）
-Total = np.vstack([Total, HC_all / 10 ** 4 * Low / Center, HC_all / 10 ** 4, HC_all / 10 ** 4 * Up / Center])
-# 单车全年HC总量变化图(10-2kg/veh·year)
-Total = np.vstack([Total, HC_min * Times * 365 / 10, HC_use_mid / 10, HC_max * Times * 365 / 10])
-# HC比例
-Total = np.vstack([Total, (HC_use_mid - HC_min * Times * 365) / (HC_max * Times * 365 - HC_min * Times * 365) * 100])
-
-# PM污染总量变化图
-# PM污染逐年（单位102ton/year）
-Total = np.vstack([Total, PM_year / 10 ** 2 * Low / Center, PM_year / 10 ** 2, PM_year / 10 ** 2 * Up / Center])
-# PM污染总量（单位103ton）
-Total = np.vstack([Total, PM_all / 10 ** 3 * Low / Center, PM_all / 10 ** 3, PM_all / 10 ** 3 * Up / Center])
-# 单车全年PM总量变化图(10-3kg/veh·year)
-Total = np.vstack([Total, PM_min * Times * 365, PM_use_mid, PM_max * Times * 365])
-# PM比例
-Total = np.vstack([Total, (PM_use_mid - PM_min * Times * 365) / (PM_max * Times * 365 - PM_min * Times * 365) * 100])
-
-# NOx污染总量变化图
-# NOx污染逐年（单位103ton/year）
-Total = np.vstack([Total, NOx_year / 10 ** 3 * Low / Center, NOx_year / 10 ** 3, NOx_year / 10 ** 3 * Up / Center])
-# NOx污染总量（单位105ton）
-Total = np.vstack([Total, NOx_all / 10 ** 5 * Low / Center, NOx_all / 10 ** 5, NOx_all / 10 ** 5 * Up / Center])
-# 单车全年NOx总量变化图(10-2kg/veh·year)
-Total = np.vstack([Total, NOx_min * Times * 365 / 10, NOx_use_mid / 10, NOx_max * Times * 365 / 10])
-# NOx比例
-Total = np.vstack([Total, (NOx_use_mid - NOx_min * Times * 365) / (NOx_max * Times * 365 - NOx_min * Times * 365) * 100])
-
-# 直接变成DataFrame为一整列，需要转置变成一行
-df_T = pd.DataFrame(Total)
-df = pd.DataFrame(df_T.values.T)
-# 写入csv文件，mode = 'a'表示只在末尾追加写入，但是可能写入重复数据，注意最后导入的时候要进行查重清洗
-df.to_csv('1.csv', index=False, header=False, mode='a')
-"""
