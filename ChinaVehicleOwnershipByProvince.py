@@ -2,48 +2,45 @@ import pandas as pd
 from pyecharts.charts import Map
 from pyecharts import options as opts
 
-df = pd.read_excel('ChinaVehicleOwnership.xlsx', sheet_name='Sheet1')#读取数据
-vals = df.values#获得数据
+df = pd.read_excel('ChinaVehicleOwnership.xlsx', sheet_name='Sheet1')   # Read Data
+vals = df.values
 
-province = []#省份
-data = []#数值
-namemap = {}#名称映射字典
+Year = 2018     # Enter all four digits of the year you want to display
+Name = 'Car' + str(Year) + '.html'  # Generates filenames
+
+province = []
+data = []
+namemap = {}
+
 
 for i in vals[0:]:
-    province.append(i[0].replace(' ', ''))#去除字符串中的空格，省份名应当是映射后的英文拼音
-    namemap[i[1].replace(' ', '')] = i[0].replace(' ', '')#映射关系为第一列的中文对应第零列的英文拼音
-    data.append(i[4])#第2开始是2020，4是2018，8是2014，9是2013,12是2010
+    province.append(i[0].replace(' ', ''))  # Remove space
+    namemap[i[1].replace(' ', '')] = i[0].replace(' ', '')  # Replace the name of each province from Chinese to English
+    data.append(i[2021-Year])
 
-#单位改为10^7
+# Change units to 10^7
 data_new = [x/1000 for x in data]
+List = [list(z) for z in zip(province, data_new)]
 
-list = [list(z) for z in zip(province, data_new)]
-#print(list)
-
-# 软件工程专业
+# Generate figure
 c = (
-    Map(init_opts=opts.InitOpts(width="1000px", height="600px"))  # 可切换主题
+    Map(init_opts=opts.InitOpts(width="1000px", height="600px"))  # Pixel size
         .set_global_opts(
-        title_opts=opts.TitleOpts(title="China Car"), #图标题
+        title_opts=opts.TitleOpts(title="China Car"),   # Title
         visualmap_opts=opts.VisualMapOpts(
-            min_=0, # bar的最小值
-            max_=3,  #bar的最大值
-            is_piecewise=False,  # 定义图例为分段型，默认为连续的图例
-            pos_top="middle",  # bar位置
+            min_=0,     # Minimum value of bar
+            max_=3,     # Maximum value of bar
+            is_piecewise=False,  # Define the legend as segmented
+            pos_top="middle",  # Position of bar
             pos_left="left",
             orient="vertical",
-            range_color=['#5FACFC', '#22C2DA', '#63D5B3', '#D4EC5A', '#FFB64D', '#FA816E', '#D15B7E', '#D15B7E', '#D15B7E']  #设置bar的颜色
+            range_color=['#5FACFC', '#22C2DA', '#63D5B3', '#D4EC5A', '#FFB64D', '#FA816E', '#D15B7E', '#D15B7E', '#D15B7E']  # Set the color of bar
         ),
-        tooltip_opts=opts.TooltipOpts(is_show=False),   # 关闭提示框
-        legend_opts=opts.LegendOpts(is_show=False), # 关闭图例
+        tooltip_opts=opts.TooltipOpts(is_show=False),   # Turn off the prompt box
+        legend_opts=opts.LegendOpts(is_show=False),     # Turn off Legend
     )
-        .add("Car", list, maptype="china",name_map=namemap)
-        #.set_global_opts(
-        #title_opts=opts.TitleOpts(title=""),
-        #visualmap_opts=opts.VisualMapOpts(max_=1200, ),
-        #)  #显示上图
-        .set_series_opts(label_opts=opts.LabelOpts(is_show=False))  #关闭名称显示
-        .render("Car2018.html") #文件名
+        .add("Car", List, maptype="china", name_map=namemap)
+
+        .set_series_opts(label_opts=opts.LabelOpts(is_show=False))  # Turn off name display
+        .render(Name)   # Filename
 )
-
-
