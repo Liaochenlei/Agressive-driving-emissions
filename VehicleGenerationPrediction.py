@@ -263,6 +263,8 @@ for i in range(0, 38):
 # print(Car_number / np.hstack((Population[1:8] * 10, Population_new[:])) * 10)
 # print(np.hstack((Population[1:8] * 10, Population_new[:])))
 
+
+"""
 Total = Car_age_year[:, 0]
 for i in range(1, 30):
     Total = np.vstack([Total, Car_age_year[:, i]])
@@ -271,7 +273,7 @@ df_T = pd.DataFrame(Total)
 df = pd.DataFrame(df_T.values.T)
 # 写入csv文件，mode = 'a'表示只在末尾追加写入，但是可能写入重复数据，注意最后导入的时候要进行查重清洗
 df.to_csv('1.csv', index=False, header=False, mode='a')
-
+"""
 
 ##############################################################
 
@@ -338,71 +340,6 @@ plt.savefig(r'D:\Fig0.png', dpi=900)
 plt.close()
 
 
-
-# GDP变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.95, bottom=0.15, right=0.95, left=0.1, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-axs.spines['right'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(6500 / 900, 3000 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.ylabel("GDP in PPP terms (US$ trillions)", fontsize=14)
-plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-plt.plot(np.arange(2016, 2051), GDP_out[1:], color='#7079DE', linewidth=2)
-# 设置坐标轴范围
-plt.ylim((0, 60))
-plt.xlim((2016, 2050))
-# 设置坐标轴刻度
-plt.yticks(np.array([15, 30, 45, 60]))
-plt.xticks(np.array([2016, 2020, 2030, 2040, 2050]))
-# plt.xticks(rotation=20)
-# plt.legend(fontsize=8, loc='upper right')
-# 保存
-plt.savefig(r'D:\Fig45.png', dpi=900)
-plt.close()
-
-
-# 人口变化图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.95, bottom=0.15, right=0.95, left=0.1, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-axs.spines['right'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(6500 / 900, 3000 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.ylabel("Population of China (10$^{9}$)", fontsize=14)
-plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-plt.plot(np.arange(2016, 2051), Population_out[1:] / 1000000, color='#7079DE', linewidth=2)
-# 设置坐标轴范围
-plt.ylim((1.3, 1.5))
-plt.xlim((2016, 2050))
-# 设置坐标轴刻度
-plt.yticks(np.array([1.35, 1.4, 1.45, 1.5]))
-plt.xticks(np.array([2016, 2020, 2030, 2040, 2050]))
-# plt.xticks(rotation=20)
-# plt.legend(fontsize=8, loc='upper right')
-# 保存
-plt.savefig(r'D:\Fig46.png', dpi=900)
-plt.close()
-
-
 # 新增车辆数
 fig, axs = plt.subplots(1, 1, dpi=900)
 plt.subplots_adjust(top=0.95, bottom=0.19, right=0.91, left=0.21, hspace=0, wspace=0)
@@ -432,6 +369,40 @@ plt.xticks(np.array([2020, 2030, 2040, 2050]))
 # plt.legend(fontsize=8, loc='upper right')
 # 保存
 plt.savefig(r'D:\Fig1.png', dpi=900)
+plt.close()
+
+
+# EV发展图
+fig, axs = plt.subplots(1, 1, dpi=900)
+plt.subplots_adjust(top=0.95, bottom=0.19, right=0.92, left=0.25, hspace=0, wspace=0)
+# 去掉右侧和顶部边框
+axs.spines['top'].set_visible(False)
+axs.spines['right'].set_visible(False)
+# 设置图片大小
+fig.set_size_inches(2500 / 900, 2100 / 900)
+# 设置坐标轴
+plt.xlabel("Year", fontsize=14)
+plt.ylabel("EV of vehicle sales (%)", fontsize=14)
+plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
+# 修改底部坐标轴（x轴）的粗细
+axs.spines['bottom'].set_linewidth(0.3)
+axs.spines['left'].set_linewidth(0.3)
+# 仅开启y轴方向的坐标轴
+plt.grid(axis='y', linewidth=0.2)
+# 输出图像
+# 画图
+plt.plot(np.arange(2013, 2051), EV_ratio * 100, color='#7079DE', linewidth=2)
+plt.plot((2035,2035), (0,100), color='grey', linestyle='--', linewidth=2)
+# 设置坐标轴范围
+plt.ylim((0, 100))
+plt.xlim((2013, 2050))
+# 设置坐标轴刻度
+plt.yticks(np.array([20, 40, 60, 80, 100]))
+plt.xticks(np.array([2020, 2030, 2040, 2050]))
+# plt.xticks(rotation=20)
+# plt.legend(fontsize=8, loc='upper right')
+# 保存
+plt.savefig(r'D:\Fig2.png', dpi=900)
 plt.close()
 
 
@@ -475,7 +446,6 @@ for i in range(0, 38):
     Blue = int(Color10[flag, 2] + (Color10[flag + 1, 2] - Color10[flag, 2]) * (i - 6 * flag) / Len)
     # 转换为颜色代码
     Color_now = '#' + str(hex(Red)[2:]) + str(hex(Green)[2:]) + str(hex(Blue)[2:])
-    print(Color_now)
     plt.plot(np.arange(0, 31, 0.1), 100 / (1 + b[i] * e ** (c[i] * np.arange(0, 31, 0.1))), color=Color_now, linewidth=0.4)
 # 设置坐标轴范围
 plt.ylim((0, 100))
@@ -483,40 +453,6 @@ plt.xlim((0, 31))
 # 设置坐标轴刻度
 plt.yticks(np.array([20, 40, 60, 80, 100]))
 plt.xticks(np.array([0, 5, 10, 15, 20, 25, 30]))
-# plt.xticks(rotation=20)
-# plt.legend(fontsize=8, loc='upper right')
-# 保存
-plt.savefig(r'D:\Fig2.png', dpi=900)
-plt.close()
-
-
-# EV发展图
-fig, axs = plt.subplots(1, 1, dpi=900)
-plt.subplots_adjust(top=0.95, bottom=0.19, right=0.92, left=0.25, hspace=0, wspace=0)
-# 去掉右侧和顶部边框
-axs.spines['top'].set_visible(False)
-axs.spines['right'].set_visible(False)
-# 设置图片大小
-fig.set_size_inches(2500 / 900, 2100 / 900)
-# 设置坐标轴
-plt.xlabel("Year", fontsize=14)
-plt.ylabel("EV of vehicle sales (%)", fontsize=14)
-plt.tick_params(labelsize=14, width=0.3, direction='in')   #设置坐标刻度值的字体大小和刻度粗细,刻度向内
-# 修改底部坐标轴（x轴）的粗细
-axs.spines['bottom'].set_linewidth(0.3)
-axs.spines['left'].set_linewidth(0.3)
-# 仅开启y轴方向的坐标轴
-plt.grid(axis='y', linewidth=0.2)
-# 输出图像
-# 画图
-plt.plot(np.arange(2013, 2051), EV_ratio * 100, color='#7079DE', linewidth=2)
-plt.plot((2035,2035), (0,100), color='grey', linestyle='--', linewidth=2)
-# 设置坐标轴范围
-plt.ylim((0, 100))
-plt.xlim((2013, 2050))
-# 设置坐标轴刻度
-plt.yticks(np.array([20, 40, 60, 80, 100]))
-plt.xticks(np.array([2020, 2030, 2040, 2050]))
 # plt.xticks(rotation=20)
 # plt.legend(fontsize=8, loc='upper right')
 # 保存
@@ -553,5 +489,5 @@ plt.xticks(np.array([2020, 2030, 2040, 2050]))
 # plt.xticks(rotation=20)
 # plt.legend(fontsize=8, loc='upper right')
 # 保存
-plt.savefig(r'D:\Fig47.png', dpi=900)
+plt.savefig(r'D:\Fig4.png', dpi=900)
 plt.close()
