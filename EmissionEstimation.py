@@ -5,22 +5,27 @@ from scipy import interpolate
 from statsmodels.tsa.arima.model import ARIMA
 
 # 读入数据
-data = pd.read_csv('VehicleDistribution.csv')
-year = np.asarray(data.iloc[:, 0])
-car_number = np.asarray(data.iloc[:, 1])
-Totalcar = np.asarray(data.iloc[:, 2])
-Rate_CO = np.asarray(data.iloc[:, 3])
-Rate_HC = np.asarray(data.iloc[:, 4])
-Rate_NOx = np.asarray(data.iloc[:, 5])
-Rate_PM = np.asarray(data.iloc[:, 6])
-car_max = np.asarray(data.iloc[:, 7])
-car_min = np.asarray(data.iloc[:, 8])
-car_mid = np.asarray(data.iloc[:, 9])
+data0 = pd.read_csv('VehicleDistributionNumber.csv')
+year = np.asarray(data0.iloc[:, 0])
+car_number = np.asarray(data0.iloc[:, 1])
+Totalcar = np.asarray(data0.iloc[:, 2])
+car_max = np.asarray(data0.iloc[:, 3])
+car_min = np.asarray(data0.iloc[:, 4])
+car_mid = np.asarray(data0.iloc[:, 5])
+
+data1 = pd.read_csv('ReductionFactor.csv')
+Rate_CO = np.asarray(data1.iloc[:, 1])
+Rate_HC = np.asarray(data1.iloc[:, 2])
+Rate_NOx = np.asarray(data1.iloc[:, 3])
+Rate_PM = np.asarray(data1.iloc[:, 4])
+
+data2 = pd.read_csv('RoadCongestionMileage.csv')
+Highway_c = np.asarray(data2.iloc[:, 3])
+City_c = np.asarray(data2.iloc[:, 4])
+
 S_rate_max = car_max / Totalcar
 S_rate_min = car_min / Totalcar
 S_rate_mid = 1 - S_rate_min - S_rate_max
-Highway_c = np.asarray(data.iloc[:, 10])
-City_c = np.asarray(data.iloc[:, 11])
 
 
 plt.rcParams['font.sans-serif'] = ['Arial']  # 指定默认字体，有Arial和Times New Roman
