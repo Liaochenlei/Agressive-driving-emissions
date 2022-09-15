@@ -18,9 +18,7 @@ High = np.asarray(data2.iloc[:, 3])
 City = np.asarray(data2.iloc[:, 4])
 
 # 计算拥堵次数
-Center = 95.088  # 系数中心点
-Low = 86    # 系数最低点
-Up = 106     # 系数最高点
+Center = 96  # 系数中心点
 Per = 5  # 饱和流占总拥堵的比例
 
 Times_high = Highway_c * Center * Per * 60 * 24 / Totalcar / 10000
