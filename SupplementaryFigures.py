@@ -3,17 +3,19 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 Color = ['#7079DE', '#FC6F68', '#FFB64D']
-data = pd.read_csv('CongestionTimes.csv')
-Number = np.asarray(data.iloc[:, 0])
-Times = np.asarray(data.iloc[:, 1])
+data0 = pd.read_csv('CongestionTimes.csv')
+Number = np.asarray(data0.iloc[:, 0])
+Times = np.asarray(data0.iloc[:, 1])
 
-data = pd.read_csv('VehicleDistribution.csv')
-year = np.asarray(data.iloc[:, 0])
-Totalcar = np.asarray(data.iloc[:, 2])
-Highway_c = np.asarray(data.iloc[:, 10])
-City_c = np.asarray(data.iloc[:, 11])
-High = np.asarray(data.iloc[:, 12])
-City = np.asarray(data.iloc[:, 13])
+data1 = pd.read_csv('VehicleDistributionNumber.csv')
+year = np.asarray(data1.iloc[:, 0])
+Totalcar = np.asarray(data1.iloc[:, 2])
+
+data2 = pd.read_csv('RoadCongestionMileage.csv')
+Highway_c = np.asarray(data2.iloc[:, 1])
+City_c = np.asarray(data2.iloc[:, 2])
+High = np.asarray(data2.iloc[:, 3])
+City = np.asarray(data2.iloc[:, 4])
 
 # 计算拥堵次数
 Center = 95.088  # 系数中心点
