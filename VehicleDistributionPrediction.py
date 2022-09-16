@@ -52,19 +52,19 @@ plt.show()
 # Prediction of three driver behaviors
 model = ARIMA(Car_max_predict, order=(1, 1, 1))
 model_fit = model.fit()
-# Predict the number from 2000 to 2050
+# Predict the number from 2022 to 2050
 forecastdata = model_fit.forecast(29)
 Car_max_ARIMA = np.hstack([Car_max_predict, forecastdata])
 
 model = ARIMA(Car_min_predict, order=(1, 1, 1))
 model_fit = model.fit()
-# Predict the number from 2000 to 2050
+# Predict the number from 2022 to 2050
 forecastdata = model_fit.forecast(29)
 Car_min_ARIMA = np.hstack([Car_min_predict, forecastdata])
 
 model = ARIMA(Car_mid_predict, order=(1, 1, 1))
 model_fit = model.fit()
-# Predict the number from 2000 to 2050
+# Predict the number from 2022 to 2050
 forecastdata = model_fit.forecast(29)
 Car_mid_ARIMA = np.hstack([Car_mid_predict, forecastdata])
 
