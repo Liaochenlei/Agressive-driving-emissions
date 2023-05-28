@@ -14,7 +14,7 @@ path = r'data\ChinaVehicleOwnership.xlsx'
 df = pd.read_excel(path, sheet_name='Sheet1')
 vals = df.values
 # Generates filenames
-Name = 'Car' + str(Year) + '.html'
+Name = 'ChinaVehicleOwnership' + str(Year) + '.html'
 
 province = []
 data = []
