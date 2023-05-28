@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 # Data path
-path = r'data\CongestionTimes.csv'
+path = r'data\Car-followingResponsesFrequency.csv'
 # Ouput path
 path_out = r'Figure'
 
