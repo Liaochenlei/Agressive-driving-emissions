@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import os
 
 # Data path
-path = r'data\VehicleAgeGenerationDistribution.csv'
+path = r'data\VehicleAge-GenDistribution.csv'
 # Ouput path
 path_out = r'Figure'
 
