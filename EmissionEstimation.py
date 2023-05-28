@@ -6,8 +6,8 @@ from statsmodels.tsa.arima.model import ARIMA
 import os
 
 # Data path
-path_distribution = r'data\VehicleDistributionNumber.csv'
-path_factor = r'data\ReductionFactor.csv'
+path_distribution = r'data\VehicleAge-GenDistribution.csv'
+path_factor = r'data\DecayFactor.csv'
 path_mileage = r'data\RoadCongestionMileage.csv'
 
 
